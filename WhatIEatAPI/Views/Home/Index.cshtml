@@ -1,0 +1,302 @@
+﻿<html>
+<head>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <script>
+
+        $(document).ready(function () {
+
+            var options = {};
+            options.url = "api/employee";
+            options.type = "GET";
+            options.dataType = "json";
+            options.success = function (data) {
+                data.forEach(function (element) {
+                    $("#employeeid").append("<option>"
+                        + element.employeeID + "</option>");
+                });
+                $("#firstname").val("select");
+            };
+            options.error = function () {
+                $("#msg").html("1. Error while calling the Web API!");
+            };
+            $.ajax(options);
+
+
+
+            $("#employeeid").change(function () {
+                var options = {};
+                options.url = "api/employee/" +
+                    $("#employeeid").val();
+                options.type = "GET";
+                options.dataType = "json";
+                options.success = function (data) {
+                    $("#firstname").val(data.firstName);
+                    $("#lastname").val(data.lastName);
+                    $("#city").val(data.city);
+                };
+                options.error = function () {
+                    $("#msg").html("2. Error while calling the Web API!");
+                };
+                $.ajax(options);
+            });
+
+
+
+            $("#insert").click(function () {
+                var options = {};
+                options.url = "api/employee";
+                options.type = "POST";
+
+                var obj = {};
+                obj.firstName = $("#firstname").val();
+                obj.lastName = $("#lastname").val();
+                obj.city = $("#city").val();
+
+                options.data = JSON.stringify(obj);
+                options.contentType = "application/json";
+                options.dataType = "html";
+
+                options.success = function (msg) {
+                    $("#msg").html(msg);
+                };
+                options.error = function () {
+                    $("#msg").html("3. Error while calling the Web API!");
+                };
+                $.ajax(options);
+            });
+
+
+
+            $("#update").click(function () {
+                var options = {};
+                options.url = "api/employee/"
+                    + $("#employeeid").val();
+                options.type = "PUT";
+
+                var obj = {};
+                obj.employeeID = $("#employeeid").val();
+                obj.firstName = $("#firstname").val();
+                obj.lastName = $("#lastname").val();
+                obj.city = $("#city").val();
+
+                options.data = JSON.stringify(obj);
+                options.contentType = "application/json";
+                options.dataType = "html";
+                options.success = function (msg) {
+                    $("#msg").html(msg);
+                };
+                options.error = function () {
+                    $("#msg").html("4. Error while calling the Web API!");
+                };
+                $.ajax(options);
+            });
+
+
+
+
+            $("#delete").click(function () {
+                var options = {};
+                options.url = "api/employee/"
+                    + $("#employeeid").val();
+                options.type = "DELETE";
+                options.dataType = "html";
+                options.success = function (msg) {
+                    $("#msg").html(msg);
+                };
+                options.error = function () {
+                    $("#msg").html("5. Error while calling the Web API!");
+                };
+                $.ajax(options);
+            });
+
+
+            // A POC - sends a clear text to the API
+            $("#analyse").click(function () {
+                var options = {};
+                options.url = "api/product";
+                options.type = "POST";
+
+                var obj = {};
+                obj.ProductName = $("#textToAnalyze").val();
+
+                options.data = JSON.stringify(obj);
+                options.contentType = "application/json";
+                options.dataType = "html";
+
+                options.success = function (msg) {
+                    $("#msg").html(msg);
+                };
+                options.error = function (msg) {
+                    $("#msg").html("Error: " + msg.responseText);
+                };
+                $.ajax(options);
+            });
+
+
+
+            // Show selected image on the page
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        $('#blah').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+
+            // Upload selected images to the server. Calls controllers Post() action
+            $("#upload").click(function (evt) {
+                var fileUpload = $("#files").get(0);
+                var files = fileUpload.files;
+                var data = new FormData();
+                for (var i = 0; i < files.length; i++) {
+                    data.append(files[i].name, files[i]);
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "api/Analysis", //Post method is in the AnalysisController.cs
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (msg) {
+                        //alert(msg);
+                        $("#msg1").html("Image was successfully loaded to the server!");
+                        $("#p2").toggle(); // Makes page2 visible
+                        $("#msg2").html(msg);
+                    },
+                    error: function () {
+                        //alert("There was error uploading files!" + msg.responseText);
+                        $("#msg1").html("There was error uploading files!");
+                    }
+                });
+            });
+
+            // After image is selected this will trigger it's presentation on the screen 
+            $("#files").change(function () {
+                readURL(this);
+                $("#upload").show();
+                $("#msg1").html(""); // To clean preveous messages
+            });
+
+        });
+
+    </script>
+    <style>
+
+        #list ul {
+            background: #ffffee;
+            padding: 10px;
+            list-style-type: none;
+        }
+
+        #list ul li {
+            background: #00ff21;
+            margin: 5px;
+        }
+
+        #unorderedlist li.red {
+            background: #fb435a;
+        }
+
+        #unorderedlist li.yellow {
+            background: yellow;
+        }
+
+        #unorderedlist li.green {
+            background: #00ff21;
+        }
+        
+    </style>
+
+
+</head>
+<body>
+    <h1 align="center">First page</h1>
+    <div id="p1" style="width:280px; height:450px; margin:0 auto; border:4px solid #000" align="center">
+        
+        <p style="color: blue;">Browse image with text to process</p>
+            
+        <form method="post" enctype="multipart/form-data">
+            <input id="files" type="file" name="files" multiple />
+            <img id="blah" src="#" width="270"/>
+            <p />
+            <input id="upload" type="button" align="center" value="Analyse" style="display: none"/>
+        </form>
+
+        <p style="color: blue;">(Note: in the app you would take a photo of the text instead)</p>   
+    </div>
+    
+
+    <div id="msg1" align="center"></div>
+    
+
+    <div id="p2" style="display:none;">
+        <h1 align="center">Second page</h1>
+        <div style="width:280px; height:450px; margin:0 auto; border:4px solid #000;" align="center">
+            <p style="color: blue;">Ingredients:</p>
+             
+            @*
+            @foreach (var item in Enumerable.Range(0,3))
+            {
+                <p>Item: @item.ToString()</p>
+            }
+            *@
+
+            <div id="msg2"></div>
+        </div>
+    </div>
+
+    <form>
+        <table border="1" cellpadding="10" align="center">
+            <tr>
+                <td>Employee ID :</td>
+                <td>
+                    <select id="employeeid"></select>
+                </td>
+            </tr>
+            <tr>
+                <td>First Name :</td>
+                <td><input id="firstname" type="text" /></td>
+            </tr>
+            <tr>
+                <td>Last Name :</td>
+                <td><input id="lastname" type="text" /></td>
+            </tr>
+            <tr>
+                <td>City :</td>
+                <td><input id="city" type="text" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="button" id="insert"
+                            value="Insert" />
+                    <input type="button" id="update"
+                            value="Update" />
+                    <input type="button" id="delete"
+                            value="Delete" />
+                </td>
+            </tr>
+            <tr>
+                <td>Text to analyse :</td>
+                <td><input id="textToAnalyze" type="text" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="button" id="analyse" value="Analyze" />
+                </td>
+            </tr>
+        </table>
+        <br />
+        <div id="msg" align="center"></div>
+        <div id="parsed" align="center"></div>
+    </form>
+</body>
+</html>

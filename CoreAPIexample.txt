@@ -1,0 +1,27 @@
+https://medium.com/@pielegacy/an-in-depth-guide-into-a-ridiculously-simple-api-using-net-core-8f5edd427b0
+
+https://github.com/pielegacy/tomatoapi
+
+API Calls:
+http://localhost:5000/api/Tomatos
+http://localhost:5000/api/Tomatos/1
+
+-----------
+API client example
+
+https://github.com/dotnet/docs/tree/master/samples/csharp/getting-started/console-webapiclient
+
+----------
+Xamarin API calls:
+http://blog.xhackers.co/httpclient-with-xamarin-forms/
+
+-------
+OCRs:
+
+Tesseract 3.0.3
+Sample: https://github.com/charlesw/tesseract-samples
+All the languages: https://github.com/tesseract-ocr/tessdata/releases/tag/3.04.00
+
+-----------
+Fussy text anaysis:
+https://habrahabr.ru/post/331174/
