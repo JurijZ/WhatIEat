@@ -13,9 +13,9 @@ namespace WhatIEatAPI.Controllers
     public class EmployeeController : Controller
     {
 
-        private NorthwindDbContext db;
+        private WhatIEatDbContext db;
 
-        public EmployeeController(NorthwindDbContext db)
+        public EmployeeController(WhatIEatDbContext db)
         {
             this.db = db;
         }
@@ -26,7 +26,7 @@ namespace WhatIEatAPI.Controllers
         {
             //return db.Employees.ToList();
 
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 return db.Employees.ToList();
             }
@@ -38,7 +38,7 @@ namespace WhatIEatAPI.Controllers
         [HttpGet("{id}")]
         public Employee Get(int id)
         {
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 return db.Employees.Find(id);
             }
@@ -50,7 +50,7 @@ namespace WhatIEatAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]Employee obj)
         {
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 db.Employees.Add(obj);
                 db.SaveChanges();
@@ -62,7 +62,7 @@ namespace WhatIEatAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody]Employee obj)
         {
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 db.Entry<Employee>(obj).State = EntityState.Modified;
                 db.SaveChanges();

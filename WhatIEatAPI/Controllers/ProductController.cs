@@ -21,9 +21,9 @@ namespace WhatIEatAPI.Controllers
     public class ProductController : Controller
     {
 
-        private NorthwindDbContext db;
+        private WhatIEatDbContext db;
 
-        public ProductController(NorthwindDbContext db)
+        public ProductController(WhatIEatDbContext db)
         {
             this.db = db;
         }
@@ -42,7 +42,7 @@ namespace WhatIEatAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]Product obj)
         {
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 if (obj.ProductName.Length == 0)
                 {

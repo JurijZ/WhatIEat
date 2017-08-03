@@ -35,7 +35,7 @@ namespace WhatIEatAPI
             services.AddMvc();
             services.AddMemoryCache();
             services.AddEntityFrameworkSqlServer();
-            services.AddDbContext<NorthwindDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<WhatIEatDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // To fix "Multipart body length limit 16384 exceeded" exception
             services.Configure<FormOptions>(x =>
@@ -83,7 +83,7 @@ namespace WhatIEatAPI
             var entryOptions = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
             
 
-            using (NorthwindDbContext db = new NorthwindDbContext())
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
             {
                 // Populate cache of short names from the database
                 var ingShort = db.Ingredients.Where(i => i.IngredientName.Length < 5).Select(i => i.IngredientName).ToList();
