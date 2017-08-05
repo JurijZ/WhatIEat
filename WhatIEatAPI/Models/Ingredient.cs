@@ -15,10 +15,12 @@ namespace WhatIEatAPI.Models
         [Required]
         public int ID { get; set; }
         [Required]
+        [StringLength(50)]
         public string IngredientName { get; set; }
         [Required]
         public Int16 IngredientDangerLevel { get; set; }
         [Required]
+        [StringLength(200)]
         public string IngredientDescription { get; set; }
         [Required]
         public Int16 IngredientPopularity { get; set; }

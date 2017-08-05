@@ -11,6 +11,7 @@ namespace WhatIEatAPI.Models
         [Required]
         public int ProductID { get; set; }
         [Required]
+        [StringLength(50)]
         public string ProductName { get; set; }
 
     }

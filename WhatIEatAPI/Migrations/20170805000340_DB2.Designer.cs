@@ -8,9 +8,10 @@ using WhatIEatAPI.Models;
 namespace WhatIEatAPI.Migrations
 {
     [DbContext(typeof(WhatIEatDbContext))]
-    partial class WhatIEatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170805000340_DB2")]
+    partial class DB2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1")
