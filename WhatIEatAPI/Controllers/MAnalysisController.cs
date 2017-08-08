@@ -56,7 +56,17 @@ namespace WhatIEatAPI.Controllers
 
         //}
 
-        // Object to receive incomming JSON in SON must use "Text" as a key.
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            // Logging
+            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "External app is testing Web API availability" + Environment.NewLine);
+
+            return Ok("OK");
+        }
+
+        // Object to receive incomming JSON. JSON must use "Text" as a key.
         public class MRecognizedText
         {
             public string Text { get; set; }
@@ -65,14 +75,15 @@ namespace WhatIEatAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]MRecognizedText recognizedText)
         {
+            // Logging
+            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Received Text:" + recognizedText.Text + Environment.NewLine);
+
+
             if (recognizedText.Text == null)
             {
-                return new ObjectResult("Nothing");
+                return new ObjectResult("An empty HTML body was sent to the server");
             }
-
-            // Logging
-            System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", "Received Text:" + recognizedText.Text + Environment.NewLine);
-
+            
             //Analyse text recognized on the smartphone;
             var analysedText = MTextAnalyser(recognizedText.Text);
 
@@ -123,7 +134,7 @@ namespace WhatIEatAPI.Controllers
                 else
                 {
                     //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
-                    System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
+                    System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
                 }
             };
 
@@ -218,7 +229,7 @@ namespace WhatIEatAPI.Controllers
 
                         // Log
                         string createText = ingredient + " - " + kbWord + " - " + distance.ToString() + Environment.NewLine;
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", createText);
+                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
 
                     }
                 }
@@ -235,7 +246,7 @@ namespace WhatIEatAPI.Controllers
 
                         // Log
                         string createText = ingredient + " - " + kbWord + " - " + distance.ToString() + Environment.NewLine;
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", createText);
+                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
                     }
 
                     // If the resulting workingset does not provide enougth acuracy (distances are too large) then apply more advanced algorithms
@@ -243,21 +254,21 @@ namespace WhatIEatAPI.Controllers
                     if (minDistance > 10)
                     {
                         // Use Lucene library Spell Checker
-                        DirectoryInfo path = new DirectoryInfo("D:\\WhatIEat\\WebAPIInAspNetCore\\Index");
+                        DirectoryInfo path = new DirectoryInfo("D:\\WhatIEat\\WhatIEatAPI\\Index");
                         Lucene.Net.Store.Directory directory = new MMapDirectory(path);
                         SpellChecker spellchecker = new SpellChecker(directory);
                         
-                        var dictionary = new PlainTextDictionary(new FileInfo("D:\\WhatIEat\\WebAPIInAspNetCore\\Index\\PlainTextDictionary.txt"));
+                        var dictionary = new PlainTextDictionary(new FileInfo("D:\\WhatIEat\\WhatIEatAPI\\Index\\PlainTextDictionary.txt"));
                         IndexWriterConfig config = new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, null);
                         spellchecker.IndexDictionary(dictionary, config, false);
                         
                         foreach (var suggestion in spellchecker.SuggestSimilar("wholeaincreal", 5))
                         {
-                            System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", "Suggested: " + suggestion + Environment.NewLine);
+                            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Suggested: " + suggestion + Environment.NewLine);
 
                         }
                         
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", "Min value: " + minDistance + Environment.NewLine);
+                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Min value: " + minDistance + Environment.NewLine);
                     }
                 }
 

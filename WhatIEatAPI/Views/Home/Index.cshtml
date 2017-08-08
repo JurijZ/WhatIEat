@@ -8,120 +8,114 @@
     <script>
 
         $(document).ready(function () {
-
             var options = {};
-            options.url = "api/employee";
+            options.url = "api/manalysis";
             options.type = "GET";
-            options.dataType = "json";
-            options.success = function (data) {
-                data.forEach(function (element) {
-                    $("#employeeid").append("<option>"
-                        + element.employeeID + "</option>");
-                });
-                $("#firstname").val("select");
+            options.success = function () {
+                $("#msg").html("Web API is working! GET to api/manalysis is returning 200");
             };
             options.error = function () {
-                $("#msg").html("1. Error while calling the Web API!");
+                $("#msg").html("Error while calling the Web API!");
             };
             $.ajax(options);
 
 
 
-            $("#employeeid").change(function () {
-                var options = {};
-                options.url = "api/employee/" +
-                    $("#employeeid").val();
-                options.type = "GET";
-                options.dataType = "json";
-                options.success = function (data) {
-                    $("#firstname").val(data.firstName);
-                    $("#lastname").val(data.lastName);
-                    $("#city").val(data.city);
-                };
-                options.error = function () {
-                    $("#msg").html("2. Error while calling the Web API!");
-                };
-                $.ajax(options);
-            });
+            //$("#employeeid").change(function () {
+            //    var options = {};
+            //    options.url = "api/employee/" +
+            //        $("#employeeid").val();
+            //    options.type = "GET";
+            //    options.dataType = "json";
+            //    options.success = function (data) {
+            //        $("#firstname").val(data.firstName);
+            //        $("#lastname").val(data.lastName);
+            //        $("#city").val(data.city);
+            //    };
+            //    options.error = function () {
+            //        $("#msg").html("2. Error while calling the Web API!");
+            //    };
+            //    $.ajax(options);
+            //});
 
 
 
-            $("#insert").click(function () {
-                var options = {};
-                options.url = "api/employee";
-                options.type = "POST";
+            //$("#insert").click(function () {
+            //    var options = {};
+            //    options.url = "api/employee";
+            //    options.type = "POST";
 
-                var obj = {};
-                obj.firstName = $("#firstname").val();
-                obj.lastName = $("#lastname").val();
-                obj.city = $("#city").val();
+            //    var obj = {};
+            //    obj.firstName = $("#firstname").val();
+            //    obj.lastName = $("#lastname").val();
+            //    obj.city = $("#city").val();
 
-                options.data = JSON.stringify(obj);
-                options.contentType = "application/json";
-                options.dataType = "html";
+            //    options.data = JSON.stringify(obj);
+            //    options.contentType = "application/json";
+            //    options.dataType = "html";
 
-                options.success = function (msg) {
-                    $("#msg").html(msg);
-                };
-                options.error = function () {
-                    $("#msg").html("3. Error while calling the Web API!");
-                };
-                $.ajax(options);
-            });
-
-
-
-            $("#update").click(function () {
-                var options = {};
-                options.url = "api/employee/"
-                    + $("#employeeid").val();
-                options.type = "PUT";
-
-                var obj = {};
-                obj.employeeID = $("#employeeid").val();
-                obj.firstName = $("#firstname").val();
-                obj.lastName = $("#lastname").val();
-                obj.city = $("#city").val();
-
-                options.data = JSON.stringify(obj);
-                options.contentType = "application/json";
-                options.dataType = "html";
-                options.success = function (msg) {
-                    $("#msg").html(msg);
-                };
-                options.error = function () {
-                    $("#msg").html("4. Error while calling the Web API!");
-                };
-                $.ajax(options);
-            });
+            //    options.success = function (msg) {
+            //        $("#msg").html(msg);
+            //    };
+            //    options.error = function () {
+            //        $("#msg").html("3. Error while calling the Web API!");
+            //    };
+            //    $.ajax(options);
+            //});
 
 
 
+            //$("#update").click(function () {
+            //    var options = {};
+            //    options.url = "api/employee/"
+            //        + $("#employeeid").val();
+            //    options.type = "PUT";
 
-            $("#delete").click(function () {
-                var options = {};
-                options.url = "api/employee/"
-                    + $("#employeeid").val();
-                options.type = "DELETE";
-                options.dataType = "html";
-                options.success = function (msg) {
-                    $("#msg").html(msg);
-                };
-                options.error = function () {
-                    $("#msg").html("5. Error while calling the Web API!");
-                };
-                $.ajax(options);
-            });
+            //    var obj = {};
+            //    obj.employeeID = $("#employeeid").val();
+            //    obj.firstName = $("#firstname").val();
+            //    obj.lastName = $("#lastname").val();
+            //    obj.city = $("#city").val();
+
+            //    options.data = JSON.stringify(obj);
+            //    options.contentType = "application/json";
+            //    options.dataType = "html";
+            //    options.success = function (msg) {
+            //        $("#msg").html(msg);
+            //    };
+            //    options.error = function () {
+            //        $("#msg").html("4. Error while calling the Web API!");
+            //    };
+            //    $.ajax(options);
+            //});
 
 
-            // A POC - sends a clear text to the API
+
+
+            //$("#delete").click(function () {
+            //    var options = {};
+            //    options.url = "api/employee/"
+            //        + $("#employeeid").val();
+            //    options.type = "DELETE";
+            //    options.dataType = "html";
+            //    options.success = function (msg) {
+            //        $("#msg").html(msg);
+            //    };
+            //    options.error = function () {
+            //        $("#msg").html("5. Error while calling the Web API!");
+            //    };
+            //    $.ajax(options);
+            //});
+
+
+            // To have a test capabilities - sends a clear text of comma separated ingredients to the API
             $("#analyse").click(function () {
                 var options = {};
-                options.url = "api/product";
+                options.url = "api/MAnalysis";
                 options.type = "POST";
 
                 var obj = {};
-                obj.ProductName = $("#textToAnalyze").val();
+                obj.Text = $("#textToAnalyze").val();
 
                 options.data = JSON.stringify(obj);
                 options.contentType = "application/json";
@@ -256,7 +250,7 @@
 
     <form>
         <table border="1" cellpadding="10" align="center">
-            <tr>
+            @*<tr>
                 <td>Employee ID :</td>
                 <td>
                     <select id="employeeid"></select>
@@ -283,9 +277,9 @@
                     <input type="button" id="delete"
                             value="Delete" />
                 </td>
-            </tr>
+            </tr>*@
             <tr>
-                <td>Text to analyse :</td>
+                <td>Comma separated list of ingredents :</td>
                 <td><input id="textToAnalyze" type="text" /></td>
             </tr>
             <tr>

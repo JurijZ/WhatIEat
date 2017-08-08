@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using WhatIEatAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace WhatIEatAPI.Controllers
 {
@@ -50,7 +51,8 @@ namespace WhatIEatAPI.Controllers
                 }
 
                 // Logging
-                System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", obj.ProductName + Environment.NewLine);
+                var LogFile = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName, "\\Log\\Log.txt");
+                System.IO.File.AppendAllText(LogFile, obj.ProductName + Environment.NewLine);
 
                 // Record the arrived string of words to a database
                 db.Products.Add(obj);
@@ -91,7 +93,7 @@ namespace WhatIEatAPI.Controllers
                 var json = JsonConvert.SerializeObject(new { Ingredients = ingredientList });
 
                 // Logging
-                System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", json + Environment.NewLine);
+                System.IO.File.AppendAllText(LogFile, json + Environment.NewLine);
 
 
                 return Content(json, "application/json");

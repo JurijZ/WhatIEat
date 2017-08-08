@@ -63,7 +63,8 @@ namespace WhatIEatAPI.Controllers
                 // Logging
                 //_logger.LogWarning("",);
                 _logger.LogInformation("Log message with NLog");
-                System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", "Uploaded image from the MVC page - " + filename + Environment.NewLine);
+                _logger.LogInformation("Uploaded image from the MVC page - " + filename);
+                //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Uploaded image from the MVC page - " + filename + Environment.NewLine);
 
                 filePath.FileName = filename;
                 
@@ -174,7 +175,8 @@ namespace WhatIEatAPI.Controllers
                 else
                 {
                     //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
-                    System.IO.File.AppendAllText(@"D:\WhatIEat\WebAPIInAspNetCore\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
+                    _logger.LogInformation(ingredient + " - not relevant");
+                    //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
                 }
             };
 
