@@ -57,6 +57,7 @@ namespace WhatIEatAPI
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            // .net core does not provide a build in logging to a file therefore we have to use external provide, NLog in this case
             //loggerFactory.AddProvider(new NLog.Extensions.Logging.NLogLoggerProvider());
             loggerFactory.AddNLog();
 

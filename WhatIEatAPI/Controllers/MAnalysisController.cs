@@ -18,25 +18,22 @@ using Lucene.Net;
 using Lucene.Net.Search.Spell;
 using Lucene.Net.Store;
 using Lucene.Net.Index;
+using Microsoft.Extensions.Logging;
 
 namespace WhatIEatAPI.Controllers
 {
     [Route("api/[controller]")]
     public class MAnalysisController : Controller
     {
-        //[ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+        private IHostingEnvironment hostingEnv; // To get the web server paths
+        private IMemoryCache _cache; // To use an In-Memory cache
+        private readonly ILogger<MAnalysisController> _logger;
 
-        private IHostingEnvironment hostingEnv; // To get web server paths
-        private IMemoryCache _cache; // To use In-Memory cache
-
-        public MAnalysisController(IHostingEnvironment env, IMemoryCache memoryCache)
+        public MAnalysisController(IHostingEnvironment env, IMemoryCache memoryCache, ILogger<MAnalysisController> logger)
         {
             this.hostingEnv = env;
             _cache = memoryCache;
+            _logger = logger;
         }
 
         [ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
@@ -61,7 +58,10 @@ namespace WhatIEatAPI.Controllers
         public IActionResult Get()
         {
             // Logging
-            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "External app is testing Web API availability" + Environment.NewLine);
+            //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "External app is testing Web API availability" + Environment.NewLine);
+            _logger.LogInformation(10, "External app is testing Web API availability");
+            //_logger.Log()
+            //NLog.LogManager.GetLogger("hh");
 
             return Ok("OK");
         }
@@ -76,8 +76,8 @@ namespace WhatIEatAPI.Controllers
         public IActionResult Post([FromBody]MRecognizedText recognizedText)
         {
             // Logging
-            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Received Text:" + recognizedText.Text + Environment.NewLine);
-
+            //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Received Text:" + recognizedText.Text + Environment.NewLine);
+            _logger.LogInformation(10, "Received Text: " + recognizedText.Text);
 
             if (recognizedText.Text == null)
             {
@@ -134,7 +134,8 @@ namespace WhatIEatAPI.Controllers
                 else
                 {
                     //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
-                    System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
+                    //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
+                    _logger.LogInformation(10, ingredient + " - not relevant");
                 }
             };
 
@@ -229,8 +230,8 @@ namespace WhatIEatAPI.Controllers
 
                         // Log
                         string createText = ingredient + " - " + kbWord + " - " + distance.ToString() + Environment.NewLine;
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
-
+                        //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
+                        _logger.LogInformation(10, createText);
                     }
                 }
                 // Long words
@@ -246,7 +247,8 @@ namespace WhatIEatAPI.Controllers
 
                         // Log
                         string createText = ingredient + " - " + kbWord + " - " + distance.ToString() + Environment.NewLine;
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
+                        //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", createText);
+                        _logger.LogInformation(10, createText, "Exception detected: ");
                     }
 
                     // If the resulting workingset does not provide enougth acuracy (distances are too large) then apply more advanced algorithms
@@ -262,13 +264,15 @@ namespace WhatIEatAPI.Controllers
                         IndexWriterConfig config = new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, null);
                         spellchecker.IndexDictionary(dictionary, config, false);
                         
+                        // Log
                         foreach (var suggestion in spellchecker.SuggestSimilar("wholeaincreal", 5))
                         {
-                            System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Suggested: " + suggestion + Environment.NewLine);
-
+                            //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Suggested: " + suggestion + Environment.NewLine);
+                            _logger.LogInformation(10, "Suggested: " + suggestion);
                         }
-                        
-                        System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Min value: " + minDistance + Environment.NewLine);
+
+                        //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Min value: " + minDistance + Environment.NewLine);
+                        _logger.LogInformation(10, "Min value: " + minDistance);
                     }
                 }
 
