@@ -66,7 +66,25 @@ namespace WhatIEatAPI
             // Populate application level cache (will be loaded from the database)
             // Make sure all values are unique
             // !!! place for the optimization - knowledge base should be ordered in a way that more frequent ingredients apear higher in the list
+            var entryOptions = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
+            
+            using (WhatIEatDbContext db = new WhatIEatDbContext())
+            {
+                // Populate cache of SHORT NAMES from the database
+                var ingShort = db.Ingredients.Where(i => i.IngredientName.Length < 5).Select(i => i.IngredientName).ToList();
+                cache.Set("knowledgeBaseShort", ingShort, entryOptions); // short words
 
+                // Populate cache of ALL NAMES from the database
+                var ingAll = db.Ingredients.Select(i => i.IngredientName).ToList();
+                cache.Set("knowledgeBaseAll", ingAll, entryOptions); // long words
+                //cache.Set("knowledgeBaseLong", knowledgeBaseLong, entryOptions); // long words
+
+                // Populate cache of ALL OBJECTS from the database
+                IEnumerable<Ingredient> ingEverything = db.Ingredients.Select(l => l).ToList<Ingredient>();
+                cache.Set<IEnumerable<Ingredient>>("knowledgeBaseEverything", ingEverything, entryOptions); // long words
+                
+            }
+            
             //List<string> knowledgeBaseShort = new List<string>(new string[] {
             //        "sugar", "salt", "honey", "soya", "egg", "milk"
             //    });
@@ -80,36 +98,13 @@ namespace WhatIEatAPI
             //        "acidity regulator"
             //    });
 
-
-            var entryOptions = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
-            
-
-            using (WhatIEatDbContext db = new WhatIEatDbContext())
-            {
-                // Populate cache of short names from the database
-                var ingShort = db.Ingredients.Where(i => i.IngredientName.Length < 5).Select(i => i.IngredientName).ToList();
-                cache.Set("knowledgeBaseShort", ingShort, entryOptions); // short words
-
-                // Populate cache of all names from the database
-                var ingAll = db.Ingredients.Select(i => i.IngredientName).ToList();
-                cache.Set("knowledgeBaseAll", ingAll, entryOptions); // long words
-                //cache.Set("knowledgeBaseLong", knowledgeBaseLong, entryOptions); // long words
-
-                // Populate cache of all names from the database
-                IEnumerable<Ingredient> ingEverything = db.Ingredients.Select(l => l).ToList<Ingredient>();
-                cache.Set<IEnumerable<Ingredient>>("knowledgeBaseEverything", ingEverything, entryOptions); // long words
-                
-            }
-
-            //app.UseMvc();
+            // Enable MVC
+            app.UseMvcWithDefaultRoute();
             //app.UseMvc(routes =>
             //{
             //    routes.MapRoute(name: "default",
             //                    template: "{controller=Home}/{action=Index}/{id?}");
             //});
-            app.UseMvcWithDefaultRoute();
-
-            
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

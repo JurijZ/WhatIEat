@@ -27,7 +27,7 @@ namespace WhatIEatAPI.Controllers
     {
         private IHostingEnvironment hostingEnv; // To get the web server paths
         private IMemoryCache _cache; // To use an In-Memory cache
-        private readonly ILogger<MAnalysisController> _logger;
+        private readonly ILogger<MAnalysisController> _logger; // To use NLog logger
 
         public MAnalysisController(IHostingEnvironment env, IMemoryCache memoryCache, ILogger<MAnalysisController> logger)
         {
@@ -36,32 +36,17 @@ namespace WhatIEatAPI.Controllers
             _logger = logger;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
+        [ApiExplorerSettings(IgnoreApi = true)] // Swagger instruction to ignore this method
         public IMemoryCache ReturnCache()
         {
             return _cache;
         }
 
-        //[HttpPost]
-        //public HttpResponseMessage Post()
-        //{
-        //    string bodyText = this.Request.Body.ToString(); //  Content.ReadAsStringAsync().Result;
-        //    //
-
-        //    //var someText = request.Content.ReadAsStringAsync().Result;
-        //    return new HttpResponseMessage() { Content = new StringContent("Hello") };
-
-        //}
-
-
         [HttpGet]
         public IActionResult Get()
         {
             // Logging
-            //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "External app is testing Web API availability" + Environment.NewLine);
             _logger.LogInformation(10, "External app is testing Web API availability");
-            //_logger.Log()
-            //NLog.LogManager.GetLogger("hh");
 
             return Ok("OK");
         }
@@ -72,73 +57,63 @@ namespace WhatIEatAPI.Controllers
             public string Text { get; set; }
         }
 
+        // Smarphone makes a Post to this method
         [HttpPost]
         public IActionResult Post([FromBody]MRecognizedText recognizedText)
         {
             // Logging
-            //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", "Received Text:" + recognizedText.Text + Environment.NewLine);
-            _logger.LogInformation(10, "Received Text: " + recognizedText.Text);
+            _logger.LogInformation(100, "Received Text: " + recognizedText.Text);
 
             if (recognizedText.Text == null)
             {
                 return new ObjectResult("An empty HTML body was sent to the server");
             }
             
-            //Analyse text recognized on the smartphone;
-            var analysedText = MTextAnalyser(recognizedText.Text);
-
-            //return Ok();
+            // Analyse text recognized on the smartphone;
+            var analysedText = MTextAnalyser(recognizedText.Text);            
             return new ObjectResult(analysedText);
             //return new ObjectResult("OK");
             //return Json(message);
+            //return Ok();
         }
+
+
 
         [ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
         private string MTextAnalyser(string recognizedText)
         {
             // Get rid of the new line symbols (\n)
-            //string newLineFreeString = Regex.Replace(recognizedText, @"\t|\n|\r", "");
             var l1 = recognizedText.Replace("\r\n", "");
             var l2 = l1.Replace(@"\n", "");
             var l3 = l2.Replace(@"\t|\n|\r", String.Empty);
-
-            //string newLineFreeString = Regex.Replace(recognizedText, "\n", String.Empty);
-            //string newLineFreeString = Regex.Replace(recognizedText, Environment.NewLine, "");
-            //recognizedText.Replace(Environment.NewLine, "");
-            //string newLineFreeString = recognizedText.ToString().TrimEnd('\r', '\n');
-
-
+            
             // Split into a list of strings by using simple various separators:
             List<string> rawListOfIngredients = l3.ToLower().Split(':', ',', '.', '%', '&', '[', ']', '(', ')').ToList();
-
-            // Analyze ingredients
-            Random r = new Random(); // This is just for testing - to genrate the random score
-
-            var ListOfIngredients = new List<Ingredient2>(); // initialize an empty list
+            
+            var ListOfIngredients = new List<Ingredient2>(); // initialize an empty list of response ingredients
             foreach (var ing in rawListOfIngredients)
             {
                 // Preprocess raw ingredient value (remove spaces and other non-related symbols)
-                var ingredient = ing.Trim();
+                var ingredientString = ing.Trim();
 
-                // Method call to analyse each ingredient
-                var checkedIngredient = MIngredientAnalyser(ingredient, r.Next(1, 10));
+                // Call ingredient Analyser Method to analyse each ingredient as a string and return an object
+                var checkedIngredient = MIngredientAnalyser(ingredientString);
+
                 // !!! important parameter. 4 - filters out results that are not relevant at all
-                if ((ingredient.Length > 4) & (ingredient.Length - checkedIngredient.FuzzyDistance) > 4)
+                if ((ingredientString.Length > 4) & (ingredientString.Length - checkedIngredient.FuzzyDistance) > 4)
                 {
                     ListOfIngredients.Add(checkedIngredient);
                 }
-                else if ((ingredient.Length <= 4) & (ingredient.Length - checkedIngredient.FuzzyDistance) > 1)
+                else if ((ingredientString.Length <= 4) & (ingredientString.Length - checkedIngredient.FuzzyDistance) > 1)
                 {
                     ListOfIngredients.Add(checkedIngredient);
                 }
                 else
                 {
-                    //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
-                    //System.IO.File.AppendAllText(@"D:\WhatIEat\WhatIEatAPI\Log\Log.txt", ingredient + " - not relevant" + Environment.NewLine);
-                    _logger.LogInformation(10, ingredient + " - not relevant");
+                    // Logging
+                    _logger.LogInformation(10, ingredientString + " - not relevant");
                 }
             };
-
             
             // Orders ListOfIngredients by the danger level and takes top 10
             var orderedIngredients = (from l in ListOfIngredients
@@ -148,20 +123,25 @@ namespace WhatIEatAPI.Controllers
             // If nothing is recognised then return a notification JSON
             if (orderedIngredients == null || !orderedIngredients.Any())
             {
-                var JSON = "[{\"IngredientName\":\"No ingredients detected\",\"IngredientDangerLevel\":0,\"FuzzyDistance\":0}]";
+                var JSON = "[{\"IngredientName\":\"No ingredients detected\",\"IngredientDescrioption\":\"No description\",\"IngredientDangerLevel\":0,\"FuzzyDistance\":0}]";
                 return JSON;
             }
             else
             {
                 // Converts collection of objects into JSON
                 var JSON = JsonConvert.SerializeObject(orderedIngredients);
+
+                // Logging
+                _logger.LogInformation(100, JSON);
+
                 return JSON;
             }
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
+
         // Finds ingredient and assigns a score to it
-        private Ingredient2 MIngredientAnalyser(string ingredient, int randomScore)
+        [ApiExplorerSettings(IgnoreApi = true)] // This is for swagger to ignore this method
+        private Ingredient2 MIngredientAnalyser(string ingredient)
         {
             var Ing = new Ingredient2();
             Dictionary<string, int> workingset = new Dictionary<string, int>();
@@ -176,11 +156,14 @@ namespace WhatIEatAPI.Controllers
 
                     Ing.IngredientName = ingredient;
                     Ing.FuzzyDistance = 0;
-                    //Ing.IngredientDangerLevel = (short)randomScore;
+                    Ing.IngredientDescription = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
+                                                    .Where(x => x.IngredientName == ingredient)
+                                                    .Select(x => x.IngredientDescription)
+                                                    .FirstOrDefault();
                     Ing.IngredientDangerLevel = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
-                                                .Where(x => x.IngredientName == ingredient)
-                                                .Select(x => x.IngredientDangerLevel)
-                                                .FirstOrDefault();
+                                                    .Where(x => x.IngredientName == ingredient)
+                                                    .Select(x => x.IngredientDangerLevel)
+                                                    .FirstOrDefault();
 
                     // Logging !!!
                     //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
@@ -200,11 +183,14 @@ namespace WhatIEatAPI.Controllers
 
                     Ing.IngredientName = ingredient;
                     Ing.FuzzyDistance = 0;
-                    //Ing.IngredientDangerLevel = (short)randomScore;
+                    Ing.IngredientDescription = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
+                                                    .Where(x => x.IngredientName == ingredient)
+                                                    .Select(x => x.IngredientDescription)
+                                                    .FirstOrDefault();
                     Ing.IngredientDangerLevel = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
-                                                .Where(x => x.IngredientName == ingredient)
-                                                .Select(x => x.IngredientDangerLevel)
-                                                .FirstOrDefault();
+                                                    .Where(x => x.IngredientName == ingredient)
+                                                    .Select(x => x.IngredientDangerLevel)
+                                                    .FirstOrDefault();
 
                     // Logging !!!
                     //string createText = ingredient + " - exact match preprocessing" + Environment.NewLine;
@@ -280,16 +266,17 @@ namespace WhatIEatAPI.Controllers
                 Ing.IngredientName = keyWithMinValue.Key;
                 Ing.FuzzyDistance = keyWithMinValue.Value;
 
-                // Retrieve ingredient danger level from the cache
-                //var dangerLevel = _cache.Get<IEnumerable<WebAPIInAspNetCore.Models.Ingredient>>("knowledgeBaseEverything");
+                _logger.LogInformation(100, "-" + keyWithMinValue.Key + "-");
 
+                Ing.IngredientDescription = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
+                                                .Where(x => x.IngredientName == keyWithMinValue.Key)
+                                                .Select(x => x.IngredientDescription)
+                                                .FirstOrDefault();
                 Ing.IngredientDangerLevel = _cache.Get<IEnumerable<WhatIEatAPI.Models.Ingredient>>("knowledgeBaseEverything")
-                                            .Where(x => x.IngredientName == keyWithMinValue.Key)
-                                            .Select(x => x.IngredientDangerLevel)
-                                            .FirstOrDefault();
-
-                //Ing.IngredientDangerLevel = dangerLevel2;
-                //Ing.IngredientDangerLevel = (short)randomScore;
+                                                .Where(x => x.IngredientName == keyWithMinValue.Key)
+                                                .Select(x => x.IngredientDangerLevel)
+                                                .FirstOrDefault();
+                
             }
 
             return Ing;
