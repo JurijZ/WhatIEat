@@ -34,6 +34,7 @@ namespace WhatIEatAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddCors();
             services.AddMemoryCache();
             services.AddEntityFrameworkSqlServer();
             services.AddDbContext<WhatIEatDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -63,6 +64,10 @@ namespace WhatIEatAPI
             loggerFactory.AddNLog();
 
             app.UseDeveloperExceptionPage();
+
+            // Shows UseCors with CorsPolicyBuilder (looks like only localhost works)
+            // https://stackoverflow.com/questions/31942037/how-to-enable-cors-in-asp-net-core
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             // Populate application level cache (will be loaded from the database)
             // Make sure all values are unique

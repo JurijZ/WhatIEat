@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Scripts\**" />
+    <Content Remove="wwwroot\Scripts\**" />
+    <EmbeddedResource Remove="wwwroot\Scripts\**" />
+    <None Remove="wwwroot\Scripts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Remove="Properties\PublishProfiles\CustomProfile1.pubxml" />
   </ItemGroup>
@@ -19,6 +26,7 @@
     <PackageReference Include="Lucene.Net.Suggest" Version="4.8.0-beta00004" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.1" />
@@ -39,7 +47,6 @@
   <ItemGroup>
     <Folder Include="Log\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="wwwroot\Scripts\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="nlog.config">
