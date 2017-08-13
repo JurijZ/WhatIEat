@@ -21,8 +21,11 @@ export class DataService {
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
 
-    return this.http.post('http://localhost/api/manalysis', {Text: 'milk'}, options)
+    return this.http.post('http://localhost/api/manalysis', {Text: 'milk, sugar'}, options)
       .map((response:Response) => response.json());
+
+
+      //.do(data=>console.log("Get all responses"+JSON.stringify(data)));
   }
 
 }

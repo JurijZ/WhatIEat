@@ -1,4 +1,8 @@
 <p>
   ingredients works!
 </p>
-<p> !!!+ {{profileObject.IngredientName}} -!!!</p>
+
+<div *ngFor="let profileObject of profileObjects">
+  <h4>{{profileObject.IngredientName}}</h4>
+  <p>{{profileObject.IngredientDescription}}</p>
+</div>

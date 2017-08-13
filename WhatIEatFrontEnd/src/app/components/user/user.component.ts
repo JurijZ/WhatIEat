@@ -75,10 +75,3 @@ interface Post{
   body:string,
   userId:number
 }
-
-interface Ingredient{
-  IngredientName: string,
-  IngredientDescription:string,
-  IngredientDangerLevel:number,
-  FuzzyDistance:number
-}
