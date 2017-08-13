@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Swashbuckle.AspNetCore.Swagger;
 using NLog.Extensions.Logging;
+using System.IO;
 
 namespace WhatIEatAPI
 {
@@ -84,7 +85,7 @@ namespace WhatIEatAPI
                 cache.Set<IEnumerable<Ingredient>>("knowledgeBaseEverything", ingEverything, entryOptions); // long words
                 
             }
-            
+
             //List<string> knowledgeBaseShort = new List<string>(new string[] {
             //        "sugar", "salt", "honey", "soya", "egg", "milk"
             //    });
@@ -97,14 +98,34 @@ namespace WhatIEatAPI
             //        "soyalecithin", "hazelnuts", "raising agents", "flavourings", "elemental iron",
             //        "acidity regulator"
             //    });
+            
+
+            // Redirect any non-API calls to Angular application
+            app.Use(async (context, next) => {
+                await next();
+                if (context.Response.StatusCode == 404 &&
+                   !Path.HasExtension(context.Request.Path.Value) && 
+                   !context.Request.Path.Value.StartsWith("/api/")
+                   )
+                {
+                    context.Request.Path = "/index.html";
+                    context.Response.StatusCode = 200;
+                    await next();
+                }
+            });
+
+            // It is not exctly clear whether static files should be before or after MVC for Angular to work properly
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             // Enable MVC
-            app.UseMvcWithDefaultRoute();
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(name: "default",
-            //                    template: "{controller=Home}/{action=Index}/{id?}");
-            //});
+            //app.UseMvcWithDefaultRoute();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(name: "default", template: "{controller=Home}/{action=Index}/{id?}");
+            });
+
+            
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
